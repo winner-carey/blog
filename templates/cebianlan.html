@@ -1,0 +1,38 @@
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">我的标签</div>
+        <div class="panel-body">
+            {% for tag in tag_count %}
+                {#                         user.username 或者 username 都可以，推荐用 username   #}
+                <p><a href="/{{ username }}/tag/{{ tag.0 }}">{{ tag.0 }}({{ tag.1 }})</a></p>
+            {% endfor %}
+
+        </div>
+    </div>
+
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <h3 class="panel-title">我的分类</h3>
+        </div>
+        <div class="panel-body">
+            {% for category in category_count %}
+                <p>
+                    <a href="/{{ username }}/category/{{ category.0 }}">{{ category.0 }}({{ category.1 }})</a>
+                </p>
+
+
+            {% endfor %}
+        </div>
+    </div>
+    <div class="panel panel-danger">
+        <div class="panel-heading">随笔档案</div>
+        <div class="panel-body">
+            {% for year_article in year_article_list %}
+                <p>
+                    <a href="/{{ username }}/archive/{{ year_article.0|date:'Y-m' }}">{{ year_article.0|date:'Y-m' }}({{ year_article.1 }})</a>
+                </p>
+
+
+            {% endfor %}
+        </div>
+    </div>

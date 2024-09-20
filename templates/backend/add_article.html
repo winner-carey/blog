@@ -1,0 +1,66 @@
+{% extends 'backend/backend_base.html' %}
+
+
+{% block backend_article %}
+
+    <div style="margin-top: 20px">
+        <form action="" method="post">
+            {% csrf_token %}
+            <p class="alert-info">添加文章</p>
+            <div>
+                <label for="">标题</label>
+                <input type="text" name="title" class="form-control">
+            </div>
+            <p>内容(Kindeditor编辑器，不支持拖放/粘贴上传图片)</p>
+            <p>
+                <textarea name="article" id="article_content" cols="30" rows="10"></textarea>
+            </p>
+            <p>
+                <input type="submit" value="提交" class="btn btn-success">
+            </p>
+
+        </form>
+    </div>
+
+    <img src="https://img2024.cnblogs.com/blog/1639920/202403/1639920-20240301231743163-786103963.png" alt="">
+
+{% endblock %}
+
+
+
+{% block js_script %}
+    <script charset="utf-8" src="/static/kindeditor/kindeditor-all-min.js"></script>
+    <script>
+
+        KindEditor.ready(function (K) {
+            window.editor = K.create('#article_content', {
+                width: '100%',
+                height: '500px',
+                // 是否允许textarea框改变宽高
+                resizeType: 1,
+                // 富文本编辑器要开启的功能
+                items: [
+                    'source', '|', 'undo', 'redo', '|', 'preview', 'print', 'template', 'code', 'cut', 'copy', 'paste',
+                    'plainpaste', 'wordpaste', '|', 'justifyleft', 'justifycenter', 'justifyright',
+                    'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript',
+                    'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 'fullscreen', '/',
+                    'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold',
+                    'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image', 'multiimage',
+                    'flash', 'media', 'insertfile', 'table', 'hr', 'emoticons', 'baidumap', 'pagebreak',
+                    'anchor', 'link', 'unlink', '|', 'about'
+                ],
+                // 富文本编辑器上传图片，填上传文件的地址
+                uploadJson: '/add_img/',
+
+                // post上传图片需要 csrf_token,用 extraFileUploadParams 添加别的参数一并传到服务器。
+                extraFileUploadParams: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+
+                },
+
+            });
+        });
+    </script>
+
+
+{% endblock %}

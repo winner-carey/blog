@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block cebian %}
+
+    {% load mytags %}
+    {% cebianlan user %}
+
+{% endblock %}
+
+{% block content %}
+
+    {% for article in article_list %}
+        <div>
+            <a href="/{{ username }}/articles/{{ article.nid }}"><h4>{{ article.title }}</h4></a>
+        </div>
+        {#自己手动定制样式，清除浮动带来的父标签塌陷，不用bootstrap的媒体对象样式#}
+        <div>
+            <div>
+                {{ article.desc }}
+            </div>
+
+            {#                    bootstrap 媒体对象样式也可以实现左右分布，无需自己清除浮动#}
+            {#                    <div class="media-left">#}
+            {#                        <a href="">#}
+            {#                            <img src="/media/{{ article.user.avator }}" alt="" height="52"#}
+            {#                                 width="52">#}
+            {#                        </a>#}
+            {#                    </div>#}
+            {##}
+            {#                    <div class="media-right">#}
+            {#                        {{ article.desc }}#}
+            {#                    </div>#}
+        </div>
+
+        <div class="small" style="margin-top: 2px;float: right;color: gray">
+            <span> {{ article.create_date|date:'Y-m-d' }}</span>&nbsp;&nbsp;
+            {#                    <a href="">{{ article.articleupdown_set.all }}</a>#}
+            <a href="">
+                {#                        {% for foo in article.articleupdown_set.all %}#}
+                {#                            {{ foo.is_up|length }}#}
+                {#                        {% endfor %}#}
+                <span class="glyphicon glyphicon-comment">评论({{ article.comment_num }})</span>
+
+            </a>&nbsp;&nbsp;
+            <a href=""><span class="glyphicon glyphicon-thumbs-up">点赞({{ article.up_num }})</span></a>
+        </div>
+        <hr>
+    {% endfor %}
+
+{% endblock %}

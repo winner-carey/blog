@@ -1,0 +1,5 @@
+.idea
+avator
+*.pyc
+media
+mybbs/migrations

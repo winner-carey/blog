@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    {#    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">#}
+    {#    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.4.0/jquery.min.js"></script>#}
+    {#    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>#}
+
+    <link rel="stylesheet" href="/static/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <script src="/static/jquery.min1.js"></script>
+    <script src="/static/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+
+    <style>
+        .clearfix {
+            *zoom: 1
+        }
+
+        /*
+            before的作用是子元素设置margin-top父元素不会一起被顶下来
+            after的作用是清除浮动
+        */
+        .clearfix:before, .clearfix:after {
+            content: " ";
+            display: table
+        }
+
+        .clearfix:after {
+            clear: both
+        }
+    </style>
+
+
+</head>
+<body>
+
+{# 头部区域 #}
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">博客园</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">首页 <span class="sr-only">(current)</span></a></li>
+                <li><a href="#">文章</a></li>
+            </ul>
+
+
+            <ul class="nav navbar-nav navbar-right">
+
+
+                {% if request.user.is_authenticated %}
+                    <li><a href="#" class="glyphicon glyphicon-user">{{ request.user.username }}</a></li>
+
+
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">更多选项 <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">修改密码</a></li>
+                            <li><a href="/backend/">后台管理</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="/logout/">退出登录</a></li>
+                        </ul>
+                    </li>
+
+                {% else %}
+
+                    <li><a href="/login/">登录</a></li>
+                    <li><a href="/register/">注册</a></li>
+
+
+                {% endif %}
+
+
+            </ul>
+
+
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+
+{# 内容区域 #}
+<div class="container-fluid">
+    <div class="row">
+
+        <div class="col-md-3">
+            <div class="panel panel-primary">
+                <div class="panel-heading">妹子图</div>
+                <div class="panel-body">
+                    请联系
+                </div>
+            </div>
+
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    <h3 class="panel-title">妹子图</h3>
+                </div>
+                <div class="panel-body">
+                    请联系
+                </div>
+            </div>
+            <div class="panel panel-danger">
+                <div class="panel-heading">妹子图</div>
+                <div class="panel-body">
+                    请联系
+                </div>
+            </div>
+
+            <div class="panel panel-warning">
+                <div class="panel-heading">
+                    <h3 class="panel-title">妹子图</h3>
+                </div>
+                <div class="panel-body">
+                    请联系
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="col-md-6">
+
+            {% for article in article_list %}
+                <div><a href=""><h4>{{ article.title }}</h4></a></div>
+                {#自己手动定制样式，清除浮动带来的父标签塌陷，不用bootstrap的媒体对象样式#}
+                <div class="clearfix">
+                    <div style="float: left;margin-right: 10px">
+                        <a href="">
+                            <img src="/media/{{ article.user.avator }}" alt="" height="52"
+                                 width="52">
+                        </a>
+                    </div>
+
+
+                    <div>
+                        {{ article.desc }}
+                    </div>
+
+                    {#                    bootstrap 媒体对象样式也可以实现左右分布，无需自己清除浮动#}
+                    {#                    <div class="media-left">#}
+                    {#                        <a href="">#}
+                    {#                            <img src="/media/{{ article.user.avator }}" alt="" height="52"#}
+                    {#                                 width="52">#}
+                    {#                        </a>#}
+                    {#                    </div>#}
+                    {##}
+                    {#                    <div class="media-right">#}
+                    {#                        {{ article.desc }}#}
+                    {#                    </div>#}
+
+
+                </div>
+
+
+
+
+
+                <div class="small" style="margin-top: 2px">
+                    <a href=""><span>{{ article.user.username }}</span></a>&nbsp;&nbsp;
+                    <span> {{ article.create_date|date:'Y-m-d' }}</span>&nbsp;&nbsp;
+
+                    {#                    <a href="">{{ article.articleupdown_set.all }}</a>#}
+
+                    <a href="">
+                        {#                        {% for foo in article.articleupdown_set.all %}#}
+                        {#                            {{ foo.is_up|length }}#}
+                        {#                        {% endfor %}#}
+
+                        <span class="glyphicon glyphicon-comment">评论({{ article.comment_num }})</span>
+
+
+                    </a>&nbsp;&nbsp;
+
+                    <a href=""><span class="glyphicon glyphicon-thumbs-up">点赞({{ article.up_num }})</span></a>
+
+
+                </div>
+                <hr>
+
+
+
+
+            {% endfor %}
+
+
+        </div>
+
+
+        <div class="col-md-3">
+            <div class="panel panel-primary">
+                <div class="panel-heading">妹子图</div>
+                <div class="panel-body">
+                    请联系
+                </div>
+            </div>
+
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    <h3 class="panel-title">妹子图</h3>
+                </div>
+                <div class="panel-body">
+                    请联系
+                </div>
+            </div>
+            <div class="panel panel-danger">
+                <div class="panel-heading">妹子图</div>
+                <div class="panel-body">
+                    请联系
+                </div>
+            </div>
+
+            <div class="panel panel-warning">
+                <div class="panel-heading">
+                    <h3 class="panel-title">妹子图</h3>
+                </div>
+                <div class="panel-body">
+                    请联系
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+</body>
+</html>

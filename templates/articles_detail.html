@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+
+
+{% block css %}
+
+    <style>
+        #div_digg {
+            float: right;
+            margin-bottom: 10px;
+            margin-right: 30px;
+            font-size: 12px;
+            width: 125px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .diggit {
+            float: left;
+            width: 46px;
+            height: 52px;
+            background: url("/static/img/upup.gif") no-repeat;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 2px;
+            padding-top: 5px;
+        }
+
+        .buryit {
+            float: right;
+            margin-left: 20px;
+            width: 46px;
+            height: 52px;
+            background: url("/static/img/downdown.gif") no-repeat;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 2px;
+            padding-top: 5px;
+        }
+
+        .clear {
+            clear: both;
+        }
+
+
+        input.author {
+            background-image: url(/static/img/icon_form.gif);
+            background-repeat: no-repeat;
+            border: 1px solid #ccc;
+            padding: 4px 4px 4px 30px;
+            width: 300px;
+            font-size: 13px;
+            background-position: 3px -3px;
+        }
+
+    </style>
+
+{% endblock %}
+
+
+
+
+
+
+{% block cebian %}
+
+    {% load mytags %}
+    {% cebianlan user %}
+
+{% endblock %}
+
+
+
+
+
+
+
+{% block content %}
+    {% csrf_token %}
+
+    <div class="text-center"><h4>{{ article_obj.title }}</h4></div>
+    <!-- safe过滤器让后端内容在前端显示原本内容，说明内容是安全的，可以原本的显示，这样html,css,javascript都能显示 -->
+    <div><p>{{ article_obj.content|safe }}</p></div>
+
+
+    <div class="clearfix">
+        <div id="div_digg">
+            <div class="diggit action">
+                <span class="diggnum" id="digg_count">{{ article_obj.up_num }}</span>
+            </div>
+            <div class="buryit action">
+                <span class="burynum" id="bury_count">{{ article_obj.down_num }}</span>
+            </div>
+            <div class="clear"></div>
+            <div class="diggword" id="digg_tips">
+            </div>
+            <div id="vip_t  ip"><a class="tip" href="https://cnblogs.vip/" target="_blank">升级成为会员</a></div>
+        </div>
+    </div>
+
+
+
+
+    <div>评论列表
+        <ul class="list-group comme_list">
+            {% for comment in comment_list %}
+
+                <li class="list-group-item">
+                    <p>
+                        <span style="color: blue">#&nbsp;{{ forloop.counter }}楼</span>
+                        <span>{{ comment.create_date|date:'Y-m-d H:m' }}&nbsp;</span>
+                        <span><a href="">{{ comment.user.username }}</a></span>
+
+                        <span style="float: right">
+                            <a class="cl_reply" id="id_reply"
+                               username="{{ comment.user.username }}" parent_id="{{ comment.pk }}">回复</a>
+                        </span>
+                    </p>
+                    {% if comment.parent_comment %}
+                        <p class="well">{{ comment.parent_comment.user.username }}:{{ comment.parent_comment.comm }}</p>
+
+                    {% endif %}
+                    <p>{{ comment.comm }}</p>
+                </li>
+
+            {% endfor %}
+        </ul>
+    </div>
+
+
+    <div class="comment">
+        <div>
+            <p>发表评论</p>
+            <p>
+                昵称：<input type="text" id="tbCommentAuthor" class="author" disabled="disabled" size="50" value="刘清政">
+            </p>
+            <p>评论内容</p>
+            <p><textarea name="" id="comment_content" cols="50" rows="10"></textarea></p>
+            <button class="btn btn-success submit_btn">提交</button>
+        </div>
+    </div>
+
+
+
+
+    <script>
+
+        var parent_id = ''
+
+        // 回复评论，实现子评论,这里不能用ID选择器，因为for循环里面都是同样的ID,只有第一个生效
+        $('.cl_reply').click(function () {
+            // 拼出 @lqz 这种格式，lqz后面有换行
+            var reply_head = "@" + $(this).attr('username') + "\n"
+            // 获取父评论ID 传给后端
+            parent_id = $(this).attr('parent_id')
+            // 将  @lqz 这种格式 放到文本框内并获取焦点
+            $("#comment_content").val(reply_head).focus()
+            {#$("#comment_content").focus().val(reply_head)#}
+        })
+
+
+        // 提交评论
+        $('.submit_btn').click(function () {
+
+            var content = $('#comment_content').val()
+
+            if (parent_id) {
+                //获取换行的索引值
+                var index = content.indexOf('\n')
+                content = content.slice(index + 1)
+
+            }
+
+
+            $.ajax({
+                url: '/comment/',
+                type: "POST",
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'article_id': {{ article_obj.nid }},
+                    'content': content,
+                    'parent_id': parent_id,
+
+                },
+                success: function (data) {
+                    // 重置每一次点击提交按钮不被上一次的父评论ID影响，结果就是每一次后端响应，parent_id重置为空
+                    parent_id = ''
+
+                    if (data.status) {
+                        // 后端返回成功标志位在清空textarea框，失败保留文本
+                        $('#comment_content').val('')
+
+                        var ss = ''
+                        var cre_date = data.cre_date
+                        var user_name = data.user_name
+                        var comm = data.comm
+
+                        if (data.parent_username) {
+                            var parent_username = data.parent_username
+                            var parent_content = data.parent_content
+
+                            ss = `
+
+                                    <li class="list-group-item">
+                                         <p>
+                                            <span>${cre_date}&nbsp;</span>
+                                            <span><a href="">${user_name}</a></span>
+
+                                         </p>
+                                         <p class="well">${parent_username}:${parent_content}</p>
+                                         <p>${comm}</p>
+                                    </li>
+
+
+                            `
+                        } else {
+                            ss = `
+                                    <li class="list-group-item">
+                                         <p>
+                                            <span>${cre_date}&nbsp;</span>
+                                            <span><a href="">${user_name}</a></span>
+
+                                         </p>
+                                         <p>${comm}</p>
+                                    </li>
+                                  `
+                        }
+
+                        $('.comme_list').append(ss)
+
+                    }
+                }
+            })
+
+        })
+
+
+        // 点赞点踩
+        $('.action').click(function () {
+            var is_up = $(this).hasClass('diggit')
+            var obj = $(this).children('span')
+
+            $.ajax({
+                url: '/diggit/',
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'article_id': {{ article_obj.nid }},
+                    'is_up': is_up,
+                },
+
+                success: function (data) {
+                    $('#digg_tips').text(data.back_msg).css('color', 'red')
+
+                    if (data.code === 1000) {
+                        //  $('#digg_count').text(parseInt($('#digg_count').text()) + 1)
+                        obj.text(parseInt(obj.text()) + 1)
+                    }
+                }
+            })
+        })
+
+    </script>
+
+{% endblock %}
+
+
